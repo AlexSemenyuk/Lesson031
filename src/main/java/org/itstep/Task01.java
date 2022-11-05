@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 /**
  * Java. Lesson031. Task01
@@ -31,11 +32,13 @@ public class Task01 {
         Scanner scanner = new Scanner(System.in);
         Scanner scanner1 = new Scanner(System.in);
 
-        String userName;
-        String userLogin;
-        String userPassword;
+        String userName = "";
+        String userLogin = "";
+        String userPassword = "";
+        String line = "";
         int n = -1;
         boolean rezultBoolean;
+        User tmp = null;
         List<User> myUsers = new LinkedList<>();
         User user1 = new User("Макаренко Оксана Олеговна", "MakarenkoOO", "st5gh7sdfh");
         User user2 = new User("Патапенко Роман Александрович", "PatapenkoRA", "sdgfwerg78");
@@ -47,84 +50,204 @@ public class Task01 {
         myUsers.add(user3);
         myUsers.add(user4);
         myUsers.add(user5);
-
-//        User user = myUsers.get(3);
-//        System.out.println(user);
-
-//        Iterator <User> iterator = myUsers.iterator();
-
-//        while (iterator.hasNext()) {		// Перебор элементов в обратном порядке
-////            System.out.println(iterator.next());
-//            iterator.next();
-//            iterator.remove();
-//        }
-//
-//        for (User user: myUsers){
-//            System.out.println(user);
-//        }
-
+        myUsers.remove(2);
 
         while (true) {
-            System.out.println("--------------------------------------------------------------------------------------");
-            System.out.println("1-add user, 2-remove user, 3-check user, 4-change users login, 5-change users password");
-            System.out.println("9-print myUsers, 0-exit");
+            System.out.println("-Menu ---------------------------------------------------------------------------------");
+            System.out.println("1-add user (user / index, user), ");
+            System.out.println("2-remove user (index / full name, login, password)");
+            System.out.println("3-find user (user / full name, login, password)");
+            System.out.println("4-change users login (index / full name, login, password)");
+            System.out.println("5-change users password (index / full name, login, password)");
+            System.out.println("9-print myUsers");
+            System.out.println("0-exit");
+            System.out.println("---------------------------------------------------------------------------------------");
+
             n = scanner.nextInt();
             switch (n) {
-                case 1:
-                    System.out.println("Введите ФИО пользователя");
-                    userName = scanner1.nextLine();
-                    System.out.println("userName = " + userName);
-                    System.out.println("Введите login пользователя");
-                    userLogin = scanner1.nextLine();
-                    System.out.println("userLogin = " + userLogin);
-                    System.out.println("Введите password пользователя");
-                    userPassword = scanner1.nextLine();
-                    System.out.println("userPassword = " + userPassword);
-                    try {
-                        rezultBoolean = myUsers.add(new User(userName, userLogin, userPassword));
-                        if (rezultBoolean) {
-                            System.out.println("User add success");
-                        } else {
-                            System.out.println("User add wrong");
-                        }
-                    } catch (ClassCastException | NullPointerException | UnsupportedOperationException ex) {
-                        ex.printStackTrace();
-                    }
-                    break;
-                case 2:
-                    Iterator <User> iterator = myUsers.iterator();
-                    System.out.println("Введите ФИО пользователя");
-                    userName = scanner.nextLine();
-                    scanner.nextLine();
-                    while (iterator.hasNext()){
-                        iterator.next();
-                        User tmp = iterator.next();
-                        if (tmp.getName().equals(userName)){
-                            try {
-//                                iterator.remove();
-                                rezultBoolean=  myUsers.remove(tmp);
-                                if (rezultBoolean) {
-                                    System.out.println("User remove success");
-                                } else {
-                                    System.out.println("User remove wrong");
+                case 1:     // Добавление объекта в список
+                    tmp = null;
+                    tmp = User.createUniqueUser(myUsers);
+                    label1:
+                    while (true) {
+                        System.out.print("1 - index, 0 - end of list >>> ");
+                        n = scanner.nextInt();
+                        switch (n) {
+                            case 1:
+                                System.out.print("Введите индекс >>> ");
+                                n = scanner.nextInt();
+                                try {
+                                    myUsers.add(n, tmp);
+                                } catch (IndexOutOfBoundsException ex) {
+                                    System.err.println("Вы не правильно ввели данные");
+                                    break;
                                 }
-                            } catch (NullPointerException | ClassCastException ex) {
-                                ex.printStackTrace();
-                            }
+                                break label1;
+                            case 0:
+                                myUsers.add(tmp);
+                                break label1;
+                            default:
+                                System.out.println("Вы не правильно ввели данные");
+                                break;
                         }
                     }
                     break;
-                case 3:
-                    // Проверить существует ли пользователь.
+                case 2:     // Удаление объекта списка (по ФИО или login или password)
+                    label2:
+                    while (true) {
+                        System.out.println("1 - remove by index, 0 - remove by full name, login, password");
+                        n = scanner.nextInt();
+                        switch (n) {
+                            case 1:
+                                System.out.print("Введите индекс >>> ");
+                                n = scanner.nextInt();
+                                try {
+                                    myUsers.remove(n);
+                                } catch (IndexOutOfBoundsException ex) {
+                                    System.err.println("Вы не правильно ввели данные");
+                                    break;
+                                }
+                                break label2;
+                            case 0:
+                                System.out.println(" Введите ФИО или login или password");
+                                line = scanner1.nextLine();
+                                myUsers.remove(User.find(myUsers, line));
+                                break label2;
+                            default:
+                                System.out.println("Вы не правильно ввели данные");
+                                break;
+                        }
+                    }
                     break;
-                case 4:
-                    // Изменить логин существующего пользователя.
+                case 3:     // Наличие пользователя вв списке ()Проверка списка на наличие объекта (по ФИО или login или password)
+                    tmp = null;
+                    userName = "";
+                    userLogin = "";
+                    userPassword = "";
+                    rezultBoolean = false;
+                    label3:
+                    while (true) {
+                        System.out.println("1 - user existence check by user, 0 - user existence check by full name, login, password");
+                        n = scanner.nextInt();
+                        switch (n) {
+                            case 1:
+                                System.out.print("Введите ФИО пользователя >>> ");
+                                userName = scanner1.nextLine();
+                                System.out.print("Введите login пользователя >>> ");
+                                userLogin = scanner1.nextLine();
+                                System.out.print("Введите password пользователя >>> ");
+                                userPassword = scanner1.nextLine();
+                                tmp = new User(userName, userLogin, userPassword);
+                                break label3;
+                            case 0:
+                                System.out.println("Введите ФИО или login или password");
+                                line = scanner1.nextLine();
+                                tmp = User.find(myUsers, line);
+                                break label3;
+                            default:
+                                System.out.println("Вы не правильно ввели данные");
+                                break;
+                        }
+                    }
+                    rezultBoolean = User.userIncludeInList(myUsers, tmp);
+                    if (rezultBoolean) {
+                        System.out.println("User include in the list");
+                    } else {
+                        System.out.println("User don't include in the list");
+                    }
                     break;
-                case 5:
-                    // Изменить пароль существующего пользователя.
+                case 4:     // Изменить логин существующего пользователя.
+                    tmp = null;
+                    userLogin = "";
+                    label4:
+                    while (true) {
+                        System.out.println("1 - change login by index, 0 - change login by full name, login, password");
+                        n = scanner.nextInt();
+                        switch (n) {
+                            case 1:
+                                System.out.print("Введите индекс >>> ");
+                                n = scanner.nextInt();
+                                Label41:
+                                while (true) {
+                                    System.out.print("Введите новый login >>> ");
+                                    userLogin = scanner1.nextLine();
+                                    if (!User.checkLoginAndPassword(myUsers, userLogin)) {
+                                        try {
+                                            myUsers.get(n).setLogin(userLogin);
+                                        } catch (IndexOutOfBoundsException ex) {
+                                            System.err.println("Вы не правильно ввели данные");
+                                        }
+                                        break Label41;
+                                    }
+                                }
+                                break label4;
+                            case 0:
+                                System.out.println("Введите ФИО или login или password изменяемого пользователя");
+                                line = scanner1.nextLine();
+                                tmp = User.find(myUsers, line);
+                                Label42:
+                                while (true) {
+                                    System.out.print("Введите новый login >>> ");
+                                    userLogin = scanner1.nextLine();
+                                    if (!User.checkLoginAndPassword(myUsers, userLogin)) {
+                                        tmp.setLogin(userLogin);
+                                        break Label42;
+                                    }
+                                }
+                                break label4;
+                            default:
+                                System.out.println("Вы не правильно ввели данные");
+                                break;
+                        }
+                    }
+                    break;
+                case 5:// Изменить пароль существующего пользователя.
+                    tmp = null;
+                    userPassword = "";
+                    label5:
+                    while (true) {
+                        System.out.println("1 - change password by index, 0 - change password by full name, login, password");
+                        n = scanner.nextInt();
+                        switch (n) {
+                            case 1:
+                                System.out.print("Введите индекс >>> ");
+                                n = scanner.nextInt();
+                                Label51:
+                                while (true) {
+                                    System.out.print("Введите новый password >>> ");
+                                    userPassword = scanner1.nextLine();
+                                    if (!User.checkLoginAndPassword(myUsers, userPassword)) {
+                                        try {
+                                            myUsers.get(n).setPassword(userPassword);
+                                        } catch (IndexOutOfBoundsException ex) {
+                                            System.err.println("Вы не правильно ввели данные");
+                                        }
+                                        break Label51;
+                                    }
+                                }
+                                break label5;
+                            case 0:
+                                System.out.println("Введите ФИО или login или password изменяемого пользователя");
+                                line = scanner1.nextLine();
+                                tmp = User.find(myUsers, line);
+                                Label52:
+                                while (true) {
+                                    System.out.print("Введите новый password >>> ");
+                                    userPassword = scanner1.nextLine();
+                                    if (!User.checkLoginAndPassword(myUsers, userPassword)) {
+                                        tmp.setPassword(userPassword);
+                                        break Label52;
+                                    }
+                                }
+                                break label5;
+                            default:
+                                System.out.println("Вы не правильно ввели данные");
+                                break;
+                        }
+                    }
                     break;
                 case 9:
-                    System.out.println("My users (Full name (Login, Password))");
+                    System.out.println("My users (Full name, login, password)");
                     for (User user : myUsers) {
                         System.out.println(user);
                     }
