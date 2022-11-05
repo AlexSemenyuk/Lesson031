@@ -65,7 +65,7 @@ public class Task01 {
 
             n = scanner.nextInt();
             switch (n) {
-                case 1:     // Добавление объекта в список
+                case 1:
                     tmp = null;
                     tmp = User.createUniqueUser(myUsers);
                     label1:
@@ -92,7 +92,7 @@ public class Task01 {
                         }
                     }
                     break;
-                case 2:     // Удаление объекта списка (по ФИО или login или password)
+                case 2:
                     label2:
                     while (true) {
                         System.out.println("1 - remove by index, 0 - remove by full name, login, password");
@@ -119,7 +119,7 @@ public class Task01 {
                         }
                     }
                     break;
-                case 3:     // Наличие пользователя вв списке ()Проверка списка на наличие объекта (по ФИО или login или password)
+                case 3:
                     tmp = null;
                     userName = "";
                     userLogin = "";
@@ -156,7 +156,7 @@ public class Task01 {
                         System.out.println("User don't include in the list");
                     }
                     break;
-                case 4:     // Изменить логин существующего пользователя.
+                case 4:
                     tmp = null;
                     userLogin = "";
                     label4:
@@ -201,7 +201,7 @@ public class Task01 {
                         }
                     }
                     break;
-                case 5:// Изменить пароль существующего пользователя.
+                case 5:
                     tmp = null;
                     userPassword = "";
                     label5:
